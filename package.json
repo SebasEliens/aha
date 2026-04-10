@@ -21,7 +21,10 @@
     "lint-staged": "^15.2.10"
   },
   "lint-staged": {
-    "apps/web/**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "apps/web/**/*.{ts,tsx}": [
+      "sh -c 'ESLINT_USE_FLAT_CONFIG=false eslint --fix \"$@\"' --",
+      "prettier --write"
+    ],
     "apps/web/**/*.{css,json}": ["prettier --write"]
   }
 }

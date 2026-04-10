@@ -1,0 +1,74 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--brown);
+  background: rgba(139, 111, 71, 0.1);
+  border: 1px solid rgba(139, 111, 71, 0.2);
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+.artifactArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+}
+
+.artifactPlaceholder {
+  max-width: 420px;
+  text-align: center;
+}
+
+.placeholderIcon {
+  font-size: 2.5rem;
+  color: var(--border-strong);
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.placeholderTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.placeholderDesc {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.placeholderHint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-weight: 500;
+}

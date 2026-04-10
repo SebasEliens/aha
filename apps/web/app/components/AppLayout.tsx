@@ -8,10 +8,9 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className={styles.wrapper}>
-      <div className={styles.grid} aria-hidden />
       <header className={styles.header}>
-        <h1 className={styles.title}>SOURDOUGH</h1>
-        <span className={styles.subtitle}>{'// message terminal'}</span>
+        <h1 className={styles.title}>Aha</h1>
+        <span className={styles.subtitle}>{'// workspace terminal'}</span>
       </header>
       <main className={styles.main}>{children}</main>
     </div>

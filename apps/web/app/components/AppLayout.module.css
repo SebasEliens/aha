@@ -1,41 +1,32 @@
 .wrapper {
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
-}
-
-.grid {
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-  pointer-events: none;
+  background: var(--bg-deep);
 }
 
 .header {
   position: relative;
-  padding: 2rem 1.5rem 1rem;
+  padding: 1.5rem 2rem 1rem;
   border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
   text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 4vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: 0.35em;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
   color: var(--accent);
-  text-shadow: 0 0 24px var(--accent-dim);
 }
 
 .subtitle {
   display: block;
-  margin-top: 0.35rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
   color: var(--text-muted);
 }
 
