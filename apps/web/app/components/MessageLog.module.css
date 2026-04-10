@@ -1,0 +1,61 @@
+.empty {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+}
+
+.emptyLabel {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.emptyHint {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.list {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.entry:last-child {
+  border-bottom: none;
+}
+
+.time {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.badge {
+  flex-shrink: 0;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-radius: 2px;
+}

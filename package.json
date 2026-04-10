@@ -1,0 +1,27 @@
+{
+  "name": "sourdough",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/web"],
+  "scripts": {
+    "dev": "npm run dev -w @sourdough/web",
+    "build": "npm run build -w @sourdough/web",
+    "start": "npm run start -w @sourdough/web",
+    "lint": "npm run lint -w @sourdough/web",
+    "lint:fix": "npm run lint:fix -w @sourdough/web",
+    "format": "npm run format -w @sourdough/web",
+    "format:check": "npm run format:check -w @sourdough/web",
+    "typecheck": "npm run typecheck -w @sourdough/web",
+    "test": "npm run test -w @sourdough/web",
+    "test:watch": "npm run test:watch -w @sourdough/web",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "apps/web/**/*.{css,json}": ["prettier --write"]
+  }
+}

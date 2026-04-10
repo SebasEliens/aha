@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sourdough
+      POSTGRES_PASSWORD: sourdough
+      POSTGRES_DB: sourdough
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/db/migrations/20250303000000_create_messages_table.sql:/docker-entrypoint-initdb.d/01-messages.sql
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://sourdough:sourdough@postgres:5432/sourdough
+      ADMIN_SECRET: ${ADMIN_SECRET:-sourdough-admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      ADMIN_SECRET: ${ADMIN_SECRET:-sourdough-admin}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
