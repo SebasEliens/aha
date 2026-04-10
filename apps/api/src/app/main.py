@@ -1,9 +1,12 @@
-from fastapi import Depends, FastAPI, Header, HTTPException
+import secrets
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 from typing import Annotated
-from app.config import get_settings
 from app.message_store.store import MessageStore, get_store
+
+security = HTTPBasic()
 
 app = FastAPI(title="AHA API", version="0.1.0")
 
@@ -19,10 +22,11 @@ app.add_middleware(
 
 
 def require_admin(
-    x_admin_secret: Annotated[str | None, Header(alias="X-Admin-Secret")] = None,
+    credentials: Annotated[HTTPBasicCredentials, Depends(security)],
 ) -> None:
-    secret = get_settings().admin_secret
-    if not secret or x_admin_secret != secret:
+    ok = secrets.compare_digest(credentials.username, "aha") and \
+         secrets.compare_digest(credentials.password, "107km")
+    if not ok:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
