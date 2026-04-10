@@ -54,6 +54,7 @@ async def test_post_messages_creates_and_returns_message(client: AsyncClient):
     assert isinstance(body["timestamp"], str)
     # Timestamp should be ISO format
     from datetime import datetime
+
     datetime.fromisoformat(body["timestamp"].replace("Z", "+00:00"))
 
 

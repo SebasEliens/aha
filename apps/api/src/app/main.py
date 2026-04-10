@@ -17,6 +17,7 @@ app.add_middleware(
     max_age=600,
 )
 
+
 def require_admin(
     x_admin_secret: Annotated[str | None, Header(alias="X-Admin-Secret")] = None,
 ) -> None:

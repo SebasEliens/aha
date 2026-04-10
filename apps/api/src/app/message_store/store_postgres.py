@@ -13,7 +13,9 @@ def _row_to_entry(row: dict) -> dict:
     return {
         "id": str(row["id"]),
         "text": row["text"],
-        "timestamp": created_at.isoformat() if hasattr(created_at, "isoformat") else str(created_at),
+        "timestamp": created_at.isoformat()
+        if hasattr(created_at, "isoformat")
+        else str(created_at),
     }
 
 

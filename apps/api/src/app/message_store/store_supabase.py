@@ -28,11 +28,7 @@ class SupabaseStore:
         ]
 
     def create_message(self, text: str) -> dict:
-        resp = (
-            self._client.table("messages")
-            .insert({"text": text})
-            .execute()
-        )
+        resp = self._client.table("messages").insert({"text": text}).execute()
         if not resp.data or len(resp.data) == 0:
             raise RuntimeError("Supabase insert returned no row")
         row = resp.data[0]
@@ -45,6 +41,4 @@ class SupabaseStore:
         }
 
     def clear_messages(self) -> None:
-        self._client.table("messages").delete().gte(
-            "created_at", "1970-01-01T00:00:00Z"
-        ).execute()
+        self._client.table("messages").delete().gte("created_at", "1970-01-01T00:00:00Z").execute()

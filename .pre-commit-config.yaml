@@ -30,6 +30,6 @@ repos:
     hooks:
       - id: prettier
         name: prettier
-        entry: npm exec -w @aha/web prettier -- --write
+        entry: npm exec --prefix apps/web -- prettier --write
         language: system
         files: ^apps/web/.*\.(ts|tsx|css|json)$
