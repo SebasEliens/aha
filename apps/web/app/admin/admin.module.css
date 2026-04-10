@@ -41,28 +41,33 @@
 .button {
   align-self: flex-start;
   padding: 0.5rem 1rem;
-  font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--bg-deep);
+  letter-spacing: 0.04em;
+  color: #fff;
   background: var(--accent);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: background 0.15s;
+}
+
+.button:hover {
+  background: var(--accent-hover);
 }
 
 .buttonDanger {
   align-self: flex-start;
   padding: 0.5rem 1rem;
-  font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--text);
+  letter-spacing: 0.04em;
+  color: #fff;
   background: var(--danger);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   margin-bottom: 1rem;
 }
