@@ -29,7 +29,7 @@ docker compose up -d
 # Postgres :5432, API :8000, Web :3000
 ```
 
-Then open http://localhost:3000. The API uses local Postgres; migrations run on first start. Optional: set `ADMIN_SECRET` in `.env` (or export) for admin/delete; default is `sourdough-admin`.
+Then open http://localhost:3000. The API uses local Postgres; migrations run on first start. Optional: set `ADMIN_SECRET` in `.env` (or export) for admin/delete; default is `aha-admin`.
 
 ### Option C: Postgres only in Docker, API/Web on host
 
@@ -37,7 +37,7 @@ Then open http://localhost:3000. The API uses local Postgres; migrations run on 
 docker compose up -d postgres
 ```
 
-Set **apps/api** env: `DATABASE_URL=postgresql://sourdough:sourdough@localhost:5432/sourdough`. Run API and web as in Option A.
+Set **apps/api** env: `DATABASE_URL=postgresql://aha:aha@localhost:5432/aha`. Run API and web as in Option A.
 
 ## Environment
 

@@ -5,7 +5,7 @@ from typing import Annotated
 from app.config import get_settings
 from app.message_store.store import MessageStore, get_store
 
-app = FastAPI(title="Sourdough API", version="0.1.0")
+app = FastAPI(title="AHA API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,7 +1,7 @@
 [project]
-name = "sourdough-api"
+name = "aha-api"
 version = "0.1.0"
-description = "Sourdough message API"
+description = "AHA message API"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",

@@ -2,9 +2,9 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: sourdough
-      POSTGRES_PASSWORD: sourdough
-      POSTGRES_DB: sourdough
+      POSTGRES_USER: aha
+      POSTGRES_PASSWORD: aha
+      POSTGRES_DB: aha
     ports:
       - "5432:5432"
     volumes:
@@ -16,8 +16,8 @@ services:
       context: ./apps/api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://sourdough:sourdough@postgres:5432/sourdough
-      ADMIN_SECRET: ${ADMIN_SECRET:-sourdough-admin}
+      DATABASE_URL: postgresql://aha:aha@postgres:5432/aha
+      ADMIN_SECRET: ${ADMIN_SECRET:-aha-admin}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     ports:
       - "8000:8000"
@@ -30,7 +30,7 @@ services:
       dockerfile: apps/web/Dockerfile
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
-      ADMIN_SECRET: ${ADMIN_SECRET:-sourdough-admin}
+      ADMIN_SECRET: ${ADMIN_SECRET:-aha-admin}
     ports:
       - "3000:3000"
     depends_on:

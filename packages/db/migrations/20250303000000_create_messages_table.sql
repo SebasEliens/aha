@@ -1,4 +1,4 @@
--- Messages table for Sourdough app
+-- Messages table for AHA app
 -- id: uuid, default gen_random_uuid()
 -- text: text not null
 -- created_at: timestamptz, default now()
