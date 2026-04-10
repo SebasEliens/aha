@@ -6,7 +6,7 @@ import styles from './Login.module.css'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -21,17 +21,19 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
 
-    if (!email.trim() || !password.trim()) {
-      setError('Please enter your email and password.')
+    if (!username.trim() || !password.trim()) {
+      setError('Please enter your username and password.')
       return
     }
 
     setLoading(true)
-    // Mock authentication — accept any credentials
-    setTimeout(() => {
-      localStorage.setItem('aha_auth', JSON.stringify({ email }))
+    if (username === 'aha' && password === '107km') {
+      localStorage.setItem('aha_auth', JSON.stringify({ username }))
       router.replace('/chat')
-    }, 600)
+    } else {
+      setLoading(false)
+      setError('Invalid username or password.')
+    }
   }
 
   return (
@@ -44,21 +46,21 @@ export default function LoginPage() {
           <span className={styles.brandName}>Aha</span>
         </div>
         <h1 className={styles.heading}>Welcome back</h1>
-        <p className={styles.subheading}>Sign in to your workspace</p>
+        <p className={styles.subheading}>Sign in with your credentials</p>
 
         <form onSubmit={handleSubmit} className={styles.form} noValidate>
           <div className={styles.field}>
-            <label htmlFor="email" className={styles.label}>
-              Email address
+            <label htmlFor="username" className={styles.label}>
+              Username
             </label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className={styles.input}
-              placeholder="you@company.com"
-              autoComplete="email"
+              placeholder="username"
+              autoComplete="username"
               autoFocus
             />
           </div>
