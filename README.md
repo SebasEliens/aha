@@ -1,6 +1,6 @@
-# Sourdough
+# AHA
 
-Monorepo: **Vercel** (Next.js UI), **Fly.io** (FastAPI backend), **Supabase** (DB).
+AHA (Agentic HaalbaarheidsAnayses) is an agent based application for feasibility studies aimed at the construction sector in the Netherlands
 
 ## Structure
 
