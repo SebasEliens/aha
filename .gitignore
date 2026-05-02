@@ -196,3 +196,5 @@ out/
 coverage/
 .vitest//
 .vercel
+
+.DS_Store
