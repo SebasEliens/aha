@@ -1,4 +1,4 @@
-"""Project repository — Protocol + Postgres + InMemory implementations."""
+"""Project repository — Protocol + Postgres + Supabase + InMemory implementations."""
 from __future__ import annotations
 
 import uuid
@@ -8,8 +8,10 @@ from typing import Annotated, Protocol
 import psycopg
 from fastapi import Depends
 from psycopg.rows import dict_row
+from supabase import Client
 
 from app.db import get_db
+from app.supabase_client import get_supabase
 
 
 def _now() -> str:
@@ -82,6 +84,47 @@ class PostgresProjectRepository:
             return cur.rowcount > 0
 
 
+class SupabaseProjectRepository:
+    def __init__(self, client: Client) -> None:
+        self._c = client
+
+    def list_all(self) -> list[dict]:
+        resp = (
+            self._c.table("projects")
+            .select("id, name, description, location, created_at, updated_at")
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return resp.data or []
+
+    def create(self, name: str, description: str | None, location: str | None) -> dict:
+        resp = (
+            self._c.table("projects")
+            .insert({"name": name, "description": description, "location": location})
+            .execute()
+        )
+        return resp.data[0]
+
+    def get(self, project_id: str) -> dict | None:
+        resp = (
+            self._c.table("projects")
+            .select("id, name, description, location, created_at, updated_at")
+            .eq("id", project_id)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def update(self, project_id: str, updates: dict) -> dict | None:
+        safe = {k: v for k, v in updates.items() if k in _UPDATABLE}
+        resp = self._c.table("projects").update(safe).eq("id", project_id).execute()
+        return resp.data[0] if resp.data else None
+
+    def delete(self, project_id: str) -> bool:
+        resp = self._c.table("projects").delete().eq("id", project_id).execute()
+        return len(resp.data or []) > 0
+
+
 # Module-level dict for the in-memory fallback
 _store: dict[str, dict] = {}
 
@@ -122,7 +165,10 @@ class InMemoryProjectRepository:
 
 def get_project_repo(
     db: Annotated[psycopg.Connection | None, Depends(get_db)],
+    supabase: Annotated[Client | None, Depends(get_supabase)],
 ) -> ProjectRepository:
     if db:
         return PostgresProjectRepository(db)
+    if supabase:
+        return SupabaseProjectRepository(supabase)
     return InMemoryProjectRepository()

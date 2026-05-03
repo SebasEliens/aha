@@ -1,4 +1,4 @@
-"""Report repository — Protocol + Postgres + InMemory for reports, sections, elements."""
+"""Report repository — Protocol + Postgres + Supabase + InMemory for reports, sections, elements."""
 from __future__ import annotations
 
 import uuid
@@ -9,8 +9,10 @@ import psycopg
 from fastapi import Depends
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
+from supabase import Client
 
 from app.db import get_db
+from app.supabase_client import get_supabase
 
 
 def _now() -> str:
@@ -255,6 +257,211 @@ class PostgresElementRepository:
 
 
 # ---------------------------------------------------------------------------
+# Supabase implementations
+# ---------------------------------------------------------------------------
+
+class SupabaseReportRepository:
+    _COLS = "id, project_id, name, status, created_at, updated_at"
+    _SECTION_COLS = "id, report_id, title, order_index, type, created_at"
+    _ELEMENT_COLS = "id, section_id, order_index, type, title, data, config, created_at"
+
+    def __init__(self, client: Client) -> None:
+        self._c = client
+
+    def list_for_project(self, project_id: str) -> list[dict]:
+        resp = (
+            self._c.table("reports")
+            .select(self._COLS)
+            .eq("project_id", project_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return resp.data or []
+
+    def create(self, project_id: str, name: str, status: str) -> dict:
+        resp = (
+            self._c.table("reports")
+            .insert({"project_id": project_id, "name": name, "status": status})
+            .execute()
+        )
+        return resp.data[0]
+
+    def get(self, project_id: str, report_id: str) -> dict | None:
+        resp = (
+            self._c.table("reports")
+            .select(self._COLS)
+            .eq("id", report_id)
+            .eq("project_id", project_id)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def get_full(self, project_id: str, report_id: str) -> dict | None:
+        report = self.get(project_id, report_id)
+        if not report:
+            return None
+        sections_resp = (
+            self._c.table("report_sections")
+            .select(self._SECTION_COLS)
+            .eq("report_id", report_id)
+            .order("order_index")
+            .execute()
+        )
+        sections = sections_resp.data or []
+        for section in sections:
+            elements_resp = (
+                self._c.table("report_elements")
+                .select(self._ELEMENT_COLS)
+                .eq("section_id", section["id"])
+                .order("order_index")
+                .execute()
+            )
+            section["elements"] = elements_resp.data or []
+        report["sections"] = sections
+        return report
+
+    def update(self, project_id: str, report_id: str, updates: dict) -> dict | None:
+        safe = {k: v for k, v in updates.items() if k in _REPORT_UPDATABLE}
+        resp = (
+            self._c.table("reports")
+            .update(safe)
+            .eq("id", report_id)
+            .eq("project_id", project_id)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def delete(self, project_id: str, report_id: str) -> bool:
+        resp = (
+            self._c.table("reports")
+            .delete()
+            .eq("id", report_id)
+            .eq("project_id", project_id)
+            .execute()
+        )
+        return len(resp.data or []) > 0
+
+
+class SupabaseSectionRepository:
+    _COLS = "id, report_id, title, order_index, type, created_at"
+
+    def __init__(self, client: Client) -> None:
+        self._c = client
+
+    def list_for_report(self, report_id: str) -> list[dict]:
+        resp = (
+            self._c.table("report_sections")
+            .select(self._COLS)
+            .eq("report_id", report_id)
+            .order("order_index")
+            .execute()
+        )
+        return resp.data or []
+
+    def create(self, report_id: str, title: str, order_index: int, type: str) -> dict:
+        resp = (
+            self._c.table("report_sections")
+            .insert({"report_id": report_id, "title": title, "order_index": order_index, "type": type})
+            .execute()
+        )
+        return resp.data[0]
+
+    def get(self, report_id: str, section_id: str) -> dict | None:
+        resp = (
+            self._c.table("report_sections")
+            .select(self._COLS)
+            .eq("id", section_id)
+            .eq("report_id", report_id)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def update(self, report_id: str, section_id: str, updates: dict) -> dict | None:
+        safe = {k: v for k, v in updates.items() if k in _SECTION_UPDATABLE}
+        resp = (
+            self._c.table("report_sections")
+            .update(safe)
+            .eq("id", section_id)
+            .eq("report_id", report_id)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def delete(self, report_id: str, section_id: str) -> bool:
+        resp = (
+            self._c.table("report_sections")
+            .delete()
+            .eq("id", section_id)
+            .eq("report_id", report_id)
+            .execute()
+        )
+        return len(resp.data or []) > 0
+
+
+class SupabaseElementRepository:
+    _COLS = "id, section_id, order_index, type, title, data, config, created_at"
+
+    def __init__(self, client: Client) -> None:
+        self._c = client
+
+    def list_for_section(self, section_id: str) -> list[dict]:
+        resp = (
+            self._c.table("report_elements")
+            .select(self._COLS)
+            .eq("section_id", section_id)
+            .order("order_index")
+            .execute()
+        )
+        return resp.data or []
+
+    def create(self, section_id: str, type: str, order_index: int,
+               title: str | None, data: dict, config: dict) -> dict:
+        resp = (
+            self._c.table("report_elements")
+            .insert({
+                "section_id": section_id, "type": type, "order_index": order_index,
+                "title": title, "data": data, "config": config,
+            })
+            .execute()
+        )
+        return resp.data[0]
+
+    def get(self, section_id: str, element_id: str) -> dict | None:
+        resp = (
+            self._c.table("report_elements")
+            .select(self._COLS)
+            .eq("id", element_id)
+            .eq("section_id", section_id)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def update(self, section_id: str, element_id: str, updates: dict) -> dict | None:
+        safe = {k: v for k, v in updates.items() if k in _ELEMENT_UPDATABLE}
+        resp = (
+            self._c.table("report_elements")
+            .update(safe)
+            .eq("id", element_id)
+            .eq("section_id", section_id)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def delete(self, section_id: str, element_id: str) -> bool:
+        resp = (
+            self._c.table("report_elements")
+            .delete()
+            .eq("id", element_id)
+            .eq("section_id", section_id)
+            .execute()
+        )
+        return len(resp.data or []) > 0
+
+
+# ---------------------------------------------------------------------------
 # InMemory implementations
 # ---------------------------------------------------------------------------
 
@@ -404,23 +611,32 @@ class InMemoryElementRepository:
 
 def get_report_repo(
     db: Annotated[psycopg.Connection | None, Depends(get_db)],
+    supabase: Annotated[Client | None, Depends(get_supabase)],
 ) -> ReportRepository:
     if db:
         return PostgresReportRepository(db)
+    if supabase:
+        return SupabaseReportRepository(supabase)
     return InMemoryReportRepository()
 
 
 def get_section_repo(
     db: Annotated[psycopg.Connection | None, Depends(get_db)],
+    supabase: Annotated[Client | None, Depends(get_supabase)],
 ) -> SectionRepository:
     if db:
         return PostgresSectionRepository(db)
+    if supabase:
+        return SupabaseSectionRepository(supabase)
     return InMemorySectionRepository()
 
 
 def get_element_repo(
     db: Annotated[psycopg.Connection | None, Depends(get_db)],
+    supabase: Annotated[Client | None, Depends(get_supabase)],
 ) -> ElementRepository:
     if db:
         return PostgresElementRepository(db)
+    if supabase:
+        return SupabaseElementRepository(supabase)
     return InMemoryElementRepository()

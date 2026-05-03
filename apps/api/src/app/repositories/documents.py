@@ -1,4 +1,4 @@
-"""Document repository — Protocol + Postgres + InMemory implementations."""
+"""Document repository — Protocol + Postgres + Supabase + InMemory implementations."""
 from __future__ import annotations
 
 import uuid
@@ -9,8 +9,10 @@ import psycopg
 from fastapi import Depends
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
+from supabase import Client
 
 from app.db import get_db
+from app.supabase_client import get_supabase
 
 
 def _now() -> str:
@@ -98,6 +100,69 @@ class PostgresDocumentRepository:
             return cur.rowcount > 0
 
 
+class SupabaseDocumentRepository:
+    _COLS = "id, project_id, name, type, file_path, url, content_extracted, metadata, created_at, updated_at"
+
+    def __init__(self, client: Client) -> None:
+        self._c = client
+
+    def list_for_project(self, project_id: str) -> list[dict]:
+        resp = (
+            self._c.table("documents")
+            .select(self._COLS)
+            .eq("project_id", project_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return resp.data or []
+
+    def create(self, project_id: str, name: str, type: str,
+               file_path: str | None, url: str | None,
+               content_extracted: str | None, metadata: dict) -> dict:
+        resp = (
+            self._c.table("documents")
+            .insert({
+                "project_id": project_id, "name": name, "type": type,
+                "file_path": file_path, "url": url,
+                "content_extracted": content_extracted, "metadata": metadata,
+            })
+            .execute()
+        )
+        return resp.data[0]
+
+    def get(self, project_id: str, doc_id: str) -> dict | None:
+        resp = (
+            self._c.table("documents")
+            .select(self._COLS)
+            .eq("id", doc_id)
+            .eq("project_id", project_id)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def update(self, project_id: str, doc_id: str, updates: dict) -> dict | None:
+        safe = {k: v for k, v in updates.items() if k in _UPDATABLE}
+        resp = (
+            self._c.table("documents")
+            .update(safe)
+            .eq("id", doc_id)
+            .eq("project_id", project_id)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+
+    def delete(self, project_id: str, doc_id: str) -> bool:
+        resp = (
+            self._c.table("documents")
+            .delete()
+            .eq("id", doc_id)
+            .eq("project_id", project_id)
+            .execute()
+        )
+        return len(resp.data or []) > 0
+
+
 _store: dict[str, dict] = {}
 
 
@@ -145,7 +210,10 @@ class InMemoryDocumentRepository:
 
 def get_document_repo(
     db: Annotated[psycopg.Connection | None, Depends(get_db)],
+    supabase: Annotated[Client | None, Depends(get_supabase)],
 ) -> DocumentRepository:
     if db:
         return PostgresDocumentRepository(db)
+    if supabase:
+        return SupabaseDocumentRepository(supabase)
     return InMemoryDocumentRepository()
