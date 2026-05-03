@@ -65,6 +65,24 @@ def update_project(
     return result
 
 
+@router.patch("/{project_id}")
+def patch_project(
+    project_id: str,
+    body: UpdateProjectBody,
+    repo: Annotated[ProjectRepository, Depends(get_project_repo)],
+) -> dict:
+    updates = body.model_dump(exclude_none=True)
+    if not updates:
+        project = repo.get(project_id)
+        if not project:
+            raise HTTPException(404, "Project not found")
+        return project
+    result = repo.update(project_id, updates)
+    if not result:
+        raise HTTPException(404, "Project not found")
+    return result
+
+
 @router.delete("/{project_id}", status_code=204)
 def delete_project(
     project_id: str,

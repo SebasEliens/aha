@@ -26,10 +26,37 @@
 }
 
 .brandName {
+  flex: 1;
+  min-width: 0;
   font-size: 1rem;
   font-weight: 700;
   color: var(--text-on-dark);
   letter-spacing: 0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: text;
+  transition: color 0.15s;
+}
+
+.brandName:hover {
+  color: var(--accent);
+}
+
+.brandNameInput {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-on-dark);
+  letter-spacing: 0.03em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.35rem;
+  outline: none;
+  width: 100%;
 }
 
 .list {
@@ -85,9 +112,12 @@
 }
 
 .footer {
-  padding: 1rem 1.25rem 0;
+  padding: 1rem 1.25rem 1rem;
   margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .user {
@@ -126,17 +156,17 @@
 }
 
 .logoutBtn {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--text-on-dark-muted);
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  text-align: center;
+  white-space: nowrap;
   transition:
     background 0.15s,
     color 0.15s,
@@ -147,4 +177,135 @@
   background: rgba(255, 255, 255, 0.07);
   color: var(--text-on-dark);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---- Project switcher ---- */
+
+.projectSwitcher {
+  display: flex;
+  flex-direction: column;
+}
+
+.projectBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.625rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-on-dark-muted);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.projectBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-on-dark);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.projectBtnMark {
+  font-size: 0.65rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.projectBtnName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectBtnChevron {
+  font-size: 0.55rem;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+  color: var(--text-on-dark-muted);
+}
+
+.projectBtnChevronOpen {
+  transform: rotate(180deg);
+}
+
+.projectList {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.projectListItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-on-dark-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.projectListItem:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-on-dark);
+}
+
+.projectListItemActive {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.projectListItemName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectListDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 0;
+}
+
+.addProjectBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.addProjectBtn:hover {
+  background: var(--accent-dim);
 }

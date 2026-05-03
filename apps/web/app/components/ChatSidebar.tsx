@@ -11,42 +11,65 @@ interface ChatMessage {
 }
 
 const MOCK_RESPONSES = [
-  "I've reviewed your request. Let me analyze the data and prepare a summary for the main panel.",
-  "That's a great question. Based on the available information, I can help you with that.",
-  "I understand. I'll generate the relevant artifacts and display them in the workspace.",
-  'Sure! I can help you explore that topic. What specific aspect would you like to focus on?',
-  "Processing your request now. You'll see the results in the center panel shortly.",
-  "I've noted that. Is there anything else you'd like me to look into?",
-  'Interesting perspective. Let me cross-reference that with the existing data.',
+  "I've reviewed your request. Let me analyse the data and prepare a summary for the main panel.",
+  'Based on the available information, I can help you structure this section of the report.',
+  "I'll generate the relevant content and display it in the workspace.",
+  'Let me cross-reference that with the existing project data.',
+  "Processing your request — you'll see the results in the centre panel shortly.",
+  "I've noted that. Would you like me to expand on any part of the analysis?",
 ]
 
 function getNextResponse(index: number): string {
   return MOCK_RESPONSES[index % MOCK_RESPONSES.length]
 }
 
+const MIN_WIDTH = 240
+const MAX_WIDTH = 640
+const DEFAULT_WIDTH = 320
+
 interface ChatSidebarProps {
   className?: string
 }
 
 export function ChatSidebar({ className }: ChatSidebarProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'init',
-      role: 'assistant',
-      content:
-        "Hello! I'm your Aha assistant. How can I help you today? You can ask me anything and I'll display relevant information in the workspace.",
-      timestamp: new Date().toISOString(),
-    },
-  ])
+  const [isOpen, setIsOpen] = useState(true)
+  const [width, setWidth] = useState(DEFAULT_WIDTH)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const responseCountRef = useRef(0)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const isDragging = useRef(false)
+  const dragStartX = useRef(0)
+  const dragStartWidth = useRef(0)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
+
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    isDragging.current = true
+    dragStartX.current = e.clientX
+    dragStartWidth.current = width
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return
+      const delta = dragStartX.current - e.clientX
+      setWidth(
+        Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, dragStartWidth.current + delta))
+      )
+    }
+
+    const handleMouseUp = () => {
+      isDragging.current = false
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
 
   const handleSend = useCallback(() => {
     const text = input.trim()
@@ -94,27 +117,59 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
       minute: '2-digit',
     })
 
+  if (!isOpen) {
+    return (
+      <aside
+        className={[styles.sidebar, styles.collapsed, className]
+          .filter(Boolean)
+          .join(' ')}
+        aria-label="Assistant (collapsed)"
+      >
+        <button
+          type="button"
+          className={styles.expandBtn}
+          onClick={() => setIsOpen(true)}
+          aria-label="Expand assistant panel"
+        >
+          ‹
+        </button>
+      </aside>
+    )
+  }
+
   return (
     <aside
       className={[styles.sidebar, className].filter(Boolean).join(' ')}
-      aria-label="Assistant chat"
+      style={{ width }}
+      aria-label="Assistant"
     >
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={handleResizeMouseDown}
+        aria-hidden
+        title="Drag to resize"
+      />
+
       <header className={styles.header}>
-        <div className={styles.headerInfo}>
-          <div className={styles.assistantAvatar} aria-hidden>
-            A
-          </div>
-          <div>
-            <div className={styles.assistantName}>Aha Assistant</div>
-            <div className={styles.assistantStatus}>
-              <span className={styles.statusDot} aria-hidden />
-              Online
-            </div>
-          </div>
-        </div>
+        <span className={styles.headerTitle}>Assistent</span>
+        <button
+          type="button"
+          className={styles.collapseBtn}
+          onClick={() => setIsOpen(false)}
+          aria-label="Collapse assistant panel"
+        >
+          ›
+        </button>
       </header>
 
       <div className={styles.messages} role="log" aria-live="polite">
+        {messages.length === 0 && (
+          <p className={styles.emptyHint}>
+            Describe your project or ask a question to start building your
+            feasibility report.
+          </p>
+        )}
+
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -157,7 +212,6 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
       <div className={styles.inputArea}>
         <div className={styles.inputWrap}>
           <textarea
-            ref={textareaRef}
             className={styles.input}
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -177,9 +231,7 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
             ➤
           </button>
         </div>
-        <p className={styles.hint}>
-          Press Enter to send · Shift+Enter for newline
-        </p>
+        <p className={styles.hint}>Enter to send · Shift+Enter for newline</p>
       </div>
     </aside>
   )
