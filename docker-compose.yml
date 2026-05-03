@@ -10,6 +10,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./packages/db/migrations/20250303000000_create_messages_table.sql:/docker-entrypoint-initdb.d/01-messages.sql
+      - ./packages/db/migrations/20250502000001_core_entities.sql:/docker-entrypoint-initdb.d/02-core-entities.sql
+      - ./packages/db/migrations/20250502000002_reports.sql:/docker-entrypoint-initdb.d/03-reports.sql
 
   api:
     build:

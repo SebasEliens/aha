@@ -75,6 +75,26 @@ just check   # Prettier + husky pre-commit + ruff + pre-commit hooks
 just test    # Run both web and API test suites
 ```
 
+## Data model
+
+```
+projects
+  ├── data_sources   (type: csv | public_db | bim | api; status: pending/processing/ready/error)
+  ├── documents      (type: pdf | word | excel | link | website)
+  ├── analytics      (status: pending/running/completed/failed; config+result jsonb)
+  └── reports
+        └── report_sections (type: cover | toc | executive_summary | content | bibliography)
+              └── report_elements (type: one of 17 element types; data+config jsonb)
+```
+
+Report element types: `cover_page`, `table_of_contents`, `section_divider`, `stat_card`,
+`data_table`, `bar_chart`, `stacked_bar_chart`, `grouped_bar_chart`, `line_chart`,
+`area_chart`, `bullet_list`, `text_block`, `comparison_table`, `benchmark_table`,
+`location_map`, `bibliography`, `two_column_layout`.
+
+Each element stores its content in `data` (jsonb) and display options in `config` (jsonb).
+See `apps/web/app/components/report/` for the expected data shapes of each type.
+
 ## Architecture
 
 ### Message Store Pattern
@@ -93,10 +113,42 @@ The API uses a strategy pattern for storage (`apps/api/src/app/message_store/`):
 
 ### API Endpoints
 
-FastAPI app in `apps/web/app/api/` (client) and `apps/api/src/app/main.py` (server):
-- `GET /messages` — fetch all messages (newest first)
-- `POST /messages` — create a message (requires non-empty `text` field)
-- `DELETE /messages` — clear all messages (requires `X-Admin-Secret` header)
+All routes are in `apps/api/src/app/main.py` (messages) and `apps/api/src/app/routers/` (new entities).
+Each router has a postgres implementation and an in-memory fallback (for dev without DB).
+The `get_db()` dependency in `apps/api/src/app/db.py` yields a psycopg3 connection or `None`.
+
+```
+GET/POST         /projects
+GET/PUT/DELETE   /projects/{id}
+GET/POST         /projects/{id}/data-sources
+GET/PUT/DELETE   /projects/{id}/data-sources/{ds_id}
+GET/POST         /projects/{id}/documents
+GET/PUT/DELETE   /projects/{id}/documents/{doc_id}
+GET/POST         /projects/{id}/analytics
+GET/PUT/DELETE   /projects/{id}/analytics/{run_id}
+GET/POST         /projects/{id}/reports
+GET/PUT/DELETE   /projects/{id}/reports/{report_id}
+GET              /projects/{id}/reports/{report_id}/full   ← nested sections+elements
+GET/POST         /projects/{id}/reports/{report_id}/sections
+PUT/DELETE       /projects/{id}/reports/{report_id}/sections/{section_id}
+GET/POST         /projects/{id}/reports/{report_id}/sections/{section_id}/elements
+PUT/DELETE       /projects/{id}/reports/{report_id}/sections/{section_id}/elements/{element_id}
+GET/POST/DELETE  /messages   (legacy chat log)
+```
+
+### Frontend routing
+
+```
+/                  → redirects to /dashboard or /login
+/login             → auth page (credentials: aha / 107km)
+/dashboard         → project list
+/projects/[id]     → project overview (4 counts)
+/projects/[id]/data
+/projects/[id]/documents
+/projects/[id]/analytics
+/projects/[id]/reports
+/projects/[id]/reports/[reportId]  → report viewer (renders all element types)
+```
 
 ### Deployment
 
