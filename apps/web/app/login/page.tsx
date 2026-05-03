@@ -22,7 +22,7 @@ export default function LoginPage() {
     setError('')
 
     if (!username.trim() || !password.trim()) {
-      setError('Please enter your username and password.')
+      setError('Vul uw gebruikersnaam en wachtwoord in.')
       return
     }
 
@@ -32,7 +32,7 @@ export default function LoginPage() {
       router.replace('/chat')
     } else {
       setLoading(false)
-      setError('Invalid username or password.')
+      setError('Ongeldige gebruikersnaam of wachtwoord.')
     }
   }
 
@@ -45,13 +45,13 @@ export default function LoginPage() {
           </span>
           <span className={styles.brandName}>Aha</span>
         </div>
-        <h1 className={styles.heading}>Welcome back</h1>
-        <p className={styles.subheading}>Sign in with your credentials</p>
+        <h1 className={styles.heading}>Welkom terug</h1>
+        <p className={styles.subheading}>Meld u aan met uw gegevens</p>
 
         <form onSubmit={handleSubmit} className={styles.form} noValidate>
           <div className={styles.field}>
             <label htmlFor="username" className={styles.label}>
-              Username
+              Gebruikersnaam
             </label>
             <input
               id="username"
@@ -59,7 +59,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className={styles.input}
-              placeholder="username"
+              placeholder="gebruikersnaam"
               autoComplete="username"
               autoFocus
             />
@@ -67,7 +67,7 @@ export default function LoginPage() {
 
           <div className={styles.field}>
             <label htmlFor="password" className={styles.label}>
-              Password
+              Wachtwoord
             </label>
             <input
               id="password"
@@ -92,13 +92,15 @@ export default function LoginPage() {
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? 'Bezig met aanmelden…' : 'Aanmelden'}
           </button>
         </form>
 
         <p className={styles.footer}>
-          Don&apos;t have an account?{' '}
-          <span className={styles.footerLink}>Contact your administrator.</span>
+          Geen account?{' '}
+          <span className={styles.footerLink}>
+            Neem contact op met uw beheerder.
+          </span>
         </p>
       </div>
     </div>

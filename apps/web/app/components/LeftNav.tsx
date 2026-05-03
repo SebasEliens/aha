@@ -11,9 +11,9 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'reports', label: 'Reports', icon: '▤' },
-  { id: 'analytics', label: 'Analytics', icon: '▦' },
-  { id: 'documents', label: 'Documents', icon: '◱' },
+  { id: 'reports', label: 'Rapport', icon: '▤' },
+  { id: 'analytics', label: 'Analyse', icon: '▦' },
+  { id: 'documents', label: 'Documenten', icon: '◱' },
   { id: 'data', label: 'Data', icon: '⊞' },
 ]
 
@@ -80,7 +80,7 @@ export function LeftNav({
             className={styles.brandName}
             role="button"
             tabIndex={0}
-            title="Click to rename project"
+            title="Klik om project te hernoemen"
             onClick={() => setEditingName(activeProject?.name ?? '')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ')
@@ -203,7 +203,7 @@ export function LeftNav({
                 className={styles.logoutBtn}
                 onClick={onLogout}
               >
-                Sign out
+                Uitloggen
               </button>
             )}
           </div>

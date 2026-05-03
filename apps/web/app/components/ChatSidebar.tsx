@@ -11,12 +11,12 @@ interface ChatMessage {
 }
 
 const MOCK_RESPONSES = [
-  "I've reviewed your request. Let me analyse the data and prepare a summary for the main panel.",
-  'Based on the available information, I can help you structure this section of the report.',
-  "I'll generate the relevant content and display it in the workspace.",
-  'Let me cross-reference that with the existing project data.',
-  "Processing your request — you'll see the results in the centre panel shortly.",
-  "I've noted that. Would you like me to expand on any part of the analysis?",
+  'Ik heb uw verzoek bekeken. Ik analyseer de gegevens en bereid een samenvatting voor in het hoofdpaneel.',
+  'Op basis van de beschikbare informatie kan ik u helpen dit onderdeel van het rapport te structureren.',
+  'Ik genereer de relevante inhoud en toon deze in de werkruimte.',
+  'Ik koppel dit terug aan de bestaande projectgegevens.',
+  'Uw verzoek wordt verwerkt — de resultaten verschijnen binnenkort in het middenpaneel.',
+  'Genoteerd. Wilt u dat ik een deel van de analyse verder uitwerk?',
 ]
 
 function getNextResponse(index: number): string {
@@ -129,7 +129,7 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
           type="button"
           className={styles.expandBtn}
           onClick={() => setIsOpen(true)}
-          aria-label="Expand assistant panel"
+          aria-label="Assistent uitklappen"
         >
           ‹
         </button>
@@ -156,7 +156,7 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
           type="button"
           className={styles.collapseBtn}
           onClick={() => setIsOpen(false)}
-          aria-label="Collapse assistant panel"
+          aria-label="Assistent inklappen"
         >
           ›
         </button>
@@ -165,8 +165,8 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
       <div className={styles.messages} role="log" aria-live="polite">
         {messages.length === 0 && (
           <p className={styles.emptyHint}>
-            Describe your project or ask a question to start building your
-            feasibility report.
+            Beschrijf uw project of stel een vraag om te beginnen met het
+            opstellen van uw haalbaarheidsstudie.
           </p>
         )}
 
@@ -216,7 +216,7 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message…"
+            placeholder="Typ een bericht…"
             rows={1}
             aria-label="Chat message"
             disabled={isTyping}
@@ -231,7 +231,9 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
             ➤
           </button>
         </div>
-        <p className={styles.hint}>Enter to send · Shift+Enter for newline</p>
+        <p className={styles.hint}>
+          Enter om te verzenden · Shift+Enter voor nieuwe regel
+        </p>
       </div>
     </aside>
   )
