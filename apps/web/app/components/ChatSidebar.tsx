@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import type { Report } from '@/app/types'
+import { mockReports } from '@/app/lib/mock-reports'
 import styles from './ChatSidebar.module.css'
 
 interface ChatMessage {
@@ -10,17 +12,14 @@ interface ChatMessage {
   timestamp: string
 }
 
-const MOCK_RESPONSES = [
-  'Ik heb uw verzoek bekeken. Ik analyseer de gegevens en bereid een samenvatting voor in het hoofdpaneel.',
-  'Op basis van de beschikbare informatie kan ik u helpen dit onderdeel van het rapport te structureren.',
-  'Ik genereer de relevante inhoud en toon deze in de werkruimte.',
-  'Ik koppel dit terug aan de bestaande projectgegevens.',
-  'Uw verzoek wordt verwerkt — de resultaten verschijnen binnenkort in het middenpaneel.',
-  'Genoteerd. Wilt u dat ik een deel van de analyse verder uitwerk?',
+const REPORT_NAMES = [
+  'Marktanalyse Eindhoven (CBRE / Sonneborgh)',
+  'Marktpotentie Particuliere Woonzorg Eindhoven (Wilgenboom)',
 ]
 
-function getNextResponse(index: number): string {
-  return MOCK_RESPONSES[index % MOCK_RESPONSES.length]
+function buildReportResponse(reportIndex: number): string {
+  const name = REPORT_NAMES[reportIndex]
+  return `Ik heb uw verzoek geanalyseerd en het volgende rapport gegenereerd:\n\n**${name}**\n\nHet rapport is zichtbaar in het Rapport-tabblad. U kunt de secties doorlopen en de bevindingen bekijken.`
 }
 
 const MIN_WIDTH = 240
@@ -29,15 +28,19 @@ const DEFAULT_WIDTH = 320
 
 interface ChatSidebarProps {
   className?: string
+  onReportGenerated?: (report: Report) => void
 }
 
-export function ChatSidebar({ className }: ChatSidebarProps) {
+export function ChatSidebar({
+  className,
+  onReportGenerated,
+}: ChatSidebarProps) {
   const [isOpen, setIsOpen] = useState(true)
   const [width, setWidth] = useState(DEFAULT_WIDTH)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const responseCountRef = useRef(0)
+  const reportCountRef = useRef(0)
   const bottomRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
   const dragStartX = useRef(0)
@@ -86,20 +89,23 @@ export function ChatSidebar({ className }: ChatSidebarProps) {
     setInput('')
     setIsTyping(true)
 
-    const responseIndex = responseCountRef.current++
-    const delay = 800 + Math.random() * 600
+    const reportIndex = reportCountRef.current % mockReports.length
+    reportCountRef.current++
+    const delay = 1000 + Math.random() * 800
 
     setTimeout(() => {
+      const report = mockReports[reportIndex]
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: getNextResponse(responseIndex),
+        content: buildReportResponse(reportIndex),
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, assistantMsg])
       setIsTyping(false)
+      onReportGenerated?.(report)
     }, delay)
-  }, [input, isTyping])
+  }, [input, isTyping, onReportGenerated])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

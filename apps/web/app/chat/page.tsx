@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { ChatLayout } from '../components/ChatLayout'
 import { LeftNav } from '../components/LeftNav'
 import { ChatSidebar } from '../components/ChatSidebar'
+import { ReportView } from '../components/report/ReportView'
 import {
   getProjects,
   createProject,
   getProject,
   patchProject,
 } from '../lib/api'
-import type { Project } from '../types'
+import type { Project, Report } from '../types'
 import styles from './chat.module.css'
 
 const LS_AUTH = 'aha_auth'
@@ -44,6 +45,7 @@ export default function ChatPage() {
   const [userEmail, setUserEmail] = useState<string | undefined>(undefined)
   const [activeProject, setActiveProject] = useState<Project | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
+  const [activeReport, setActiveReport] = useState<Report | null>(null)
 
   // Auth check
   useEffect(() => {
@@ -101,6 +103,11 @@ export default function ChatPage() {
     loadProjects()
   }, [loadProjects])
 
+  const handleReportGenerated = (report: Report) => {
+    setActiveReport(report)
+    setActiveNav('reports')
+  }
+
   const handleLogout = () => {
     localStorage.removeItem(LS_AUTH)
     router.replace('/login')
@@ -154,24 +161,34 @@ export default function ChatPage() {
           onLogout={handleLogout}
         />
       }
-      rightSidebar={<ChatSidebar />}
+      rightSidebar={<ChatSidebar onReportGenerated={handleReportGenerated} />}
     >
       <div className={styles.content}>
         <header className={styles.topbar}>
           <h2 className={styles.pageTitle}>{content.title}</h2>
         </header>
 
-        <div className={styles.artifactArea}>
-          <div className={styles.artifactPlaceholder}>
-            <div className={styles.placeholderIcon} aria-hidden>
-              ◫
+        <div
+          className={
+            activeReport && activeNav === 'reports'
+              ? styles.reportArea
+              : styles.artifactArea
+          }
+        >
+          {activeReport && activeNav === 'reports' ? (
+            <ReportView report={activeReport} />
+          ) : (
+            <div className={styles.artifactPlaceholder}>
+              <div className={styles.placeholderIcon} aria-hidden>
+                ◫
+              </div>
+              <h3 className={styles.placeholderTitle}>Werkruimte</h3>
+              <p className={styles.placeholderDesc}>{content.description}</p>
+              <p className={styles.placeholderHint}>
+                Stel de assistent een vraag om hier inhoud te genereren.
+              </p>
             </div>
-            <h3 className={styles.placeholderTitle}>Werkruimte</h3>
-            <p className={styles.placeholderDesc}>{content.description}</p>
-            <p className={styles.placeholderHint}>
-              Stel de assistent een vraag om hier inhoud te genereren.
-            </p>
-          </div>
+          )}
         </div>
       </div>
     </ChatLayout>
