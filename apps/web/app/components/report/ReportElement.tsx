@@ -312,21 +312,23 @@ export function ReportElement({ element }: Props) {
           <div className={styles.statCards}>
             {items.map((item, i) => (
               <div key={i} className={styles.statCard}>
-                <span
-                  className={[
-                    styles.statValue,
-                    item.trendPositive === false && item.value.startsWith('+')
-                      ? styles.statTrendNeg
-                      : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  {item.value}
+                <div className={styles.statValueRow}>
+                  <span
+                    className={[
+                      styles.statValue,
+                      item.trendPositive === false && item.value.startsWith('+')
+                        ? styles.statTrendNeg
+                        : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {item.value}
+                  </span>
                   {item.unit && (
                     <span className={styles.statUnit}>{item.unit}</span>
                   )}
-                </span>
+                </div>
                 <span className={styles.statLabel}>{item.label}</span>
               </div>
             ))}
